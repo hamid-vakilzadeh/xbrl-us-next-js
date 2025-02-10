@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
@@ -8,9 +9,12 @@ import { Button } from '@/components/ui/Button'
 import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { Icons } from '@/components/shared/Icons'
 import { useXBRLAuth } from '@/hooks/use-xbrl-auth'
+import { useAuth } from '@/components/auth/auth-provider'
 
 export function SignInForm() {
-  const { signIn, isLoading, error } = useXBRLAuth()
+  const { signIn: signInXBRL, isLoading, error } = useXBRLAuth()
+  const { signIn: signInAuth } = useAuth()
+  const router = useRouter()
   
   const [formData, setFormData] = useState({
     email: '',
@@ -34,13 +38,25 @@ export function SignInForm() {
     setErrorMessage('')
 
     try {
-      await signIn(
+      const authResult = await signInXBRL(
         formData.email,
         formData.password,
         formData.clientId,
         formData.clientSecret
       )
-      // Successful login will be handled by the auth provider
+      
+      // Update auth context with tokens and credentials
+      await signInAuth(
+        formData.email,
+        authResult.access_token,
+        authResult.refresh_token,
+        Date.now() + authResult.expires_in * 1000,
+        formData.clientId,
+        formData.clientSecret
+      )
+      
+      // Redirect to dashboard
+      router.push('/dashboard')
     } catch (err: any) {
       if (err.code === 'UNAUTHORIZED') {
         setErrorMessage('Invalid credentials. Please check your email and password.')
