@@ -39,6 +39,32 @@ export function SignInForm() {
             className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
           />
         </div>
+        <div className="space-y-2">
+          <label
+            htmlFor="password"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Client ID
+          </label>
+          <input
+            id="clientId"
+            type="password"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          />
+        </div>
+        <div className="space-y-2">
+          <label
+            htmlFor="password"
+            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Client Secret
+          </label>
+          <input
+            id="clientSecret"
+            type="password"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          />
+        </div>
         <button
           type="submit"
           disabled={isLoading}
