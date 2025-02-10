@@ -10,6 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { Icons } from '@/components/shared/Icons'
 import { useXBRLAuth } from '@/hooks/use-xbrl-auth'
 import { useAuth } from '@/components/auth/auth-provider'
+import { fetchXBRLMeta } from '@/lib/api/meta'
 
 export function SignInForm() {
   const { signIn: signInXBRL, isLoading, error } = useXBRLAuth()
@@ -54,6 +55,14 @@ export function SignInForm() {
         formData.clientId,
         formData.clientSecret
       )
+
+      // Fetch and store meta data
+      try {
+        await fetchXBRLMeta(authResult.access_token)
+      } catch (metaError) {
+        console.error('Failed to fetch meta data:', metaError)
+        // Continue with navigation even if meta fetch fails
+      }
       
       // Redirect to dashboard
       router.push('/dashboard')

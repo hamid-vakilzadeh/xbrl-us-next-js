@@ -41,34 +41,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
       <div className="flex w-full h-[calc(100vh-64px)]">
-        {/* Sidebar */}
-        <div 
-          className="flex-none bg-white border-r relative"
-          style={{ width: sidebarWidth }}
-        >
-          <div className="p-4">
-            <h2 className="text-xl font-semibold">Dashboard</h2>
-          </div>
-          <nav className="mt-4">
-            <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              Overview
-            </div>
-            <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              Reports
-            </div>
-            <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              Settings
-            </div>
-          </nav>
-
-          {/* Resize Handle */}
-          <div
-            className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-gray-300 active:bg-gray-400"
-            onMouseDown={startResizing}
-          />
-        </div>
-
-        {/* Main Content */}
         <main className="flex-1 p-8 bg-gray-50 overflow-auto">
           {children}
         </main>

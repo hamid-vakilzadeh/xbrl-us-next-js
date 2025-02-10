@@ -1,6 +1,17 @@
-import { Loader2 } from "lucide-react"
+'use client'
 
-export const Icons = {
+import { Database, Loader2, LucideIcon } from 'lucide-react'
+
+export type IconType = LucideIcon
+
+interface Icons {
+  database: IconType
+  spinner: IconType
+  // Add more icons as needed
+}
+
+export const Icons: Icons = {
+  database: Database,
   spinner: Loader2,
 }
 

@@ -1,64 +1,61 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/components/auth/auth-provider'
 import { fetchXBRLMeta, getStoredMeta, type XBRLMeta } from '@/lib/api/meta'
 
-export function useXBRLMeta() {
+interface UseXBRLMetaResult {
+  meta: XBRLMeta | null
+  isLoading: boolean
+  error: Error | null
+  refetch: () => Promise<void>
+}
+
+export function useXBRLMeta(): UseXBRLMetaResult {
   const { user } = useAuth()
   const [meta, setMeta] = useState<XBRLMeta | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
-  useEffect(() => {
-    async function loadMeta() {
-      // First try to get from localStorage
-      const storedMeta = getStoredMeta()
-      if (storedMeta) {
-        setMeta(storedMeta)
-        setIsLoading(false)
-        return
-      }
-
-      // If not in storage and we have an access token, fetch it
-      if (user?.accessToken) {
-        try {
-          const fetchedMeta = await fetchXBRLMeta(user.accessToken)
-          setMeta(fetchedMeta)
-        } catch (err) {
-          setError(err instanceof Error ? err : new Error('Failed to fetch meta data'))
-        }
-      }
-      
-      setIsLoading(false)
-    }
-
-    loadMeta()
-  }, [user?.accessToken])
-
-  const refreshMeta = async () => {
+  const fetchMeta = useCallback(async () => {
     if (!user?.accessToken) {
       setError(new Error('No access token available'))
+      setIsLoading(false)
       return
     }
 
-    setIsLoading(true)
-    setError(null)
-
     try {
-      const fetchedMeta = await fetchXBRLMeta(user.accessToken)
-      setMeta(fetchedMeta)
+      setIsLoading(true)
+      setError(null)
+      const data = await fetchXBRLMeta(user.accessToken)
+      setMeta(data)
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to fetch meta data'))
+      // Try to fall back to stored data
+      const storedData = getStoredMeta()
+      if (storedData) {
+        setMeta(storedData)
+      }
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [user?.accessToken])
+
+  // Load meta data on mount or when auth changes
+  useEffect(() => {
+    const storedData = getStoredMeta()
+    if (storedData) {
+      setMeta(storedData)
+      setIsLoading(false)
+    } else {
+      fetchMeta()
+    }
+  }, [user?.accessToken, fetchMeta])
 
   return {
     meta,
     isLoading,
     error,
-    refreshMeta
+    refetch: fetchMeta
   }
 }
