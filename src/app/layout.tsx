@@ -20,13 +20,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="relative flex min-h-screen flex-col">
-          <Header />
-          <main className="flex-1">
-            <AuthProvider>{children}</AuthProvider>
-          </main>
-          <Footer />
-        </div>
+        <AuthProvider>
+          <div className="relative flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </AuthProvider>
       </body>
     </html>
   )

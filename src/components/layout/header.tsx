@@ -1,7 +1,23 @@
-// src/components/layout/header.tsx
+'use client'
+
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/components/auth/auth-provider'
+import { Button } from '@/components/ui/Button'
 
 export function Header() {
+  const { isAuthenticated, signOut } = useAuth()
+  const router = useRouter()
+
+  const handleAuthClick = async () => {
+    if (isAuthenticated) {
+      await signOut()
+      router.push('/')
+    } else {
+      router.push('/signin')
+    }
+  }
+
   return (
     <header className="w-full border-b bg-white">
       <div className="container flex h-16 items-center justify-between px-4">
@@ -31,6 +47,13 @@ export function Header() {
           >
             Support
           </Link>
+          <Button 
+            variant="default"
+            className="bg-black text-white hover:bg-gray-800"
+            onClick={handleAuthClick}
+          >
+            {isAuthenticated ? 'Sign Out' : 'Sign In'}
+          </Button>
         </nav>
       </div>
     </header>
