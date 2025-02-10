@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useXBRLMeta } from '@/hooks/use-xbrl-meta'
 import { Combobox } from '@/components/ui/combobox'
 import { Icons } from '@/components/shared/Icons'
@@ -12,7 +13,8 @@ interface EndpointSelectorProps {
 }
 
 export function EndpointSelector({ onEndpointSelect, selectedEndpoint }: EndpointSelectorProps) {
-  const { meta, isLoading, error, refetch } = useXBRLMeta()
+  const router = useRouter()
+  const { meta, isLoading, error } = useXBRLMeta()
 
   if (isLoading) {
     return (
@@ -27,19 +29,15 @@ export function EndpointSelector({ onEndpointSelect, selectedEndpoint }: Endpoin
       <div className="p-4 space-y-4">
         <Alert variant="destructive">
           <AlertDescription>
-            {error.message}
+            Please sign in to access XBRL endpoints
           </AlertDescription>
         </Alert>
         <Button 
           variant="outline" 
           className="w-full" 
-          onClick={() => refetch()}
-          disabled={isLoading}
+          onClick={() => router.push('/signin')}
         >
-          {isLoading && (
-            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-          )}
-          Try Again
+          Sign In
         </Button>
       </div>
     )
