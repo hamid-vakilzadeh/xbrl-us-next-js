@@ -1,78 +1,138 @@
 'use client'
 
 import { useState } from 'react'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Input } from '@/components/ui/Input'
+import { Label } from '@/components/ui/Label'
+import { Button } from '@/components/ui/Button'
+import { Alert, AlertDescription } from '@/components/ui/Alert'
+import { Icons } from '@/components/shared/icons'
+import { useXBRLAuth } from '@/hooks/use-xbrl-auth'
 
 export function SignInForm() {
-  const [isLoading, setIsLoading] = useState(false)
+  const { signIn, isLoading, error } = useXBRLAuth()
+  
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    clientId: '',
+    clientSecret: ''
+  })
+
+  const [errorMessage, setErrorMessage] = useState<string>('')
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setErrorMessage('')
+
+    try {
+      await signIn(
+        formData.email,
+        formData.password,
+        formData.clientId,
+        formData.clientSecret
+      )
+      // Successful login will be handled by the auth provider
+    } catch (err: any) {
+      if (err.code === 'UNAUTHORIZED') {
+        setErrorMessage('Invalid credentials. Please check your email and password.')
+      } else if (err.code === 'BAD_REQUEST') {
+        setErrorMessage('Please check all fields are filled correctly.')
+      } else {
+        setErrorMessage('An error occurred. Please try again.')
+      }
+    }
+  }
 
   return (
-    <form onSubmit={(e) => {
-      e.preventDefault()
-      setIsLoading(true)
-      // Handle sign in
-    }}>
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <label 
-            htmlFor="email"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-            placeholder="m@example.com"
-          />
-        </div>
-        <div className="space-y-2">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-          />
-        </div>
-        <div className="space-y-2">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Client ID
-          </label>
-          <input
-            id="clientId"
-            type="password"
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-          />
-        </div>
-        <div className="space-y-2">
-          <label
-            htmlFor="password"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Client Secret
-          </label>
-          <input
-            id="clientSecret"
-            type="password"
-            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md text-sm font-medium h-10 px-4 py-2 transition-colors"
-        >
-          {isLoading ? 'Signing in...' : 'Sign In'}
-        </button>
-      </div>
-    </form>
+    <Card className="w-full max-w-lg">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold">Sign in to XBRL</CardTitle>
+        <CardDescription>
+          Enter your XBRL credentials to access your account
+        </CardDescription>
+      </CardHeader>
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-4">
+          {errorMessage && (
+            <Alert variant="destructive">
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
+          
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="name@example.com"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+              disabled={isLoading}
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="clientId">Client ID</Label>
+            <Input
+              id="clientId"
+              name="clientId"
+              type="text"
+              placeholder="Your XBRL Client ID"
+              value={formData.clientId}
+              onChange={handleInputChange}
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="clientSecret">Client Secret</Label>
+            <Input
+              id="clientSecret"
+              name="clientSecret"
+              type="password"
+              placeholder="Your XBRL Client Secret"
+              value={formData.clientSecret}
+              onChange={handleInputChange}
+              required
+              disabled={isLoading}
+            />
+          </div>
+        </CardContent>
+        
+        <CardFooter>
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading && (
+              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Sign in
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
   )
 }
