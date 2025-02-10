@@ -1,8 +1,8 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import '@/styles/tokens.css'
+import { fontSans, fontMono, fontHeading } from '@/lib/fonts'
+import { AuthProvider } from '@/components/auth/auth-provider'
+import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'XBRL US App',
@@ -15,8 +15,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${fontSans.variable} ${fontMono.variable} ${fontHeading.variable} font-sans`}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   )
 }
