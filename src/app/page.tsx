@@ -1,11 +1,23 @@
-export default function Home() {
+// src/app/page.tsx
+import Link from 'next/link'
+import { Button } from '@/components/ui/Button'
+
+export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="bg-background text-foreground">
-        <h1 className="font-heading text-3xl">Hello</h1>
-        <p className="font-sans">Regular text</p>
-        <code className="font-mono">Code text</code>
-</div>    
-</main>
+    <div className="flex flex-col items-center justify-center flex-1 p-4">
+      <div className="text-center space-y-6">
+        <h1 className="text-3xl font-bold tracking-tight">
+          Welcome to XBRL Explorer
+        </h1>
+        <p className="text-xl text-gray-600 max-w-[600px]">
+          Access and analyze financial data using the XBRL API
+        </p>
+        <Link href="/signin">
+          <Button size="lg" className="mt-6">
+            Sign In to Get Started
+          </Button>
+        </Link>
+      </div>
+    </div>
   )
 }

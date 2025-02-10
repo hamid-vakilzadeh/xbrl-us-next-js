@@ -1,12 +1,15 @@
-import '@/styles/globals.css'
-import '@/styles/tokens.css'
-import { fontSans, fontMono, fontHeading } from '@/lib/fonts'
+// src/app/layout.tsx
+import { Inter } from 'next/font/google'
+import { Header } from '@/components/layout/header'
+import { Footer } from '@/components/layout/footer'
 import { AuthProvider } from '@/components/auth/auth-provider'
-import type { Metadata } from 'next'
+import '@/styles/globals.css'
 
-export const metadata: Metadata = {
-  title: 'XBRL US App',
-  description: 'XBRL US Next.js Application',
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata = {
+  title: 'XBRL Explorer',
+  description: 'Explore and analyze XBRL financial data',
 }
 
 export default function RootLayout({
@@ -15,11 +18,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${fontSans.variable} ${fontMono.variable} ${fontHeading.variable} font-sans`}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+    <html lang="en">
+      <body className={inter.className}>
+        <div className="relative flex min-h-screen flex-col">
+          <Header />
+          <main className="flex-1">
+            <AuthProvider>{children}</AuthProvider>
+          </main>
+          <Footer />
+        </div>
       </body>
     </html>
   )
