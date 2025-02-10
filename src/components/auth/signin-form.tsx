@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/Input'
 import { Label } from '@/components/ui/Label'
 import { Button } from '@/components/ui/Button'
 import { Alert, AlertDescription } from '@/components/ui/Alert'
-import { Icons } from '@/components/shared/icons'
+import { Icons } from '@/components/shared/Icons'
 import { useXBRLAuth } from '@/hooks/use-xbrl-auth'
 
 export function SignInForm() {

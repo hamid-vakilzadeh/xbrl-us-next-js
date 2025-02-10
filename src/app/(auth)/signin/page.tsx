@@ -1,10 +1,12 @@
-// src/app/(auth)/signin/page.tsx
 import { SignInForm } from '@/components/auth/signin-form'
+import { PageLayout } from '@/components/layout/page-layout'
 
 export default function SignInPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <SignInForm />
-    </div>
+    <PageLayout>
+      <div className="flex justify-center items-center h-full">
+        <SignInForm />
+      </div>
+    </PageLayout>
   )
 }
