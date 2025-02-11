@@ -8,6 +8,8 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter()
   const { isAuthenticated, isLoading } = useAuth()
 
+  // Temporarily disabled auth check for development
+  /*
   React.useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push('/signin')
@@ -17,6 +19,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   if (isLoading || !isAuthenticated) {
     return null
   }
+  */
 
   return (
     <div className="flex w-full h-[calc(100vh-64px)]">
