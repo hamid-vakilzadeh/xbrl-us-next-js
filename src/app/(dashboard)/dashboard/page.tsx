@@ -1,58 +1,50 @@
-'use client'
+import { AppSidebar } from "@/components/dashboard/app-sidebar"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
 
-import dynamic from 'next/dynamic'
-import { Suspense, useState, useEffect } from 'react'
-import { EndpointSelector } from '@/components/dashboard/endpoint-selector'
-import { Icons } from '@/components/shared/Icons'
-import { ResizableSidebar } from '@/components/layout/resizable-sidebar'
-
-const SELECTED_ENDPOINT_KEY = 'xbrl_selected_endpoint'
-
-// Dynamically import Canvas with no SSR to avoid hydration issues with dynamic data
-const Canvas = dynamic(
-  () => import('@/components/dashboard/canvas').then(mod => ({ default: mod.Canvas })),
-  {
-    loading: () => (
-      <div className="h-full w-full flex items-center justify-center">
-        <Icons.spinner className="h-8 w-8 animate-spin" />
-      </div>
-    ),
-    ssr: false
-  }
-)
-
-export default function DashboardPage() {
-  const [selectedEndpoint, setSelectedEndpoint] = useState<string>()
-
-  useEffect(() => {
-    const stored = localStorage.getItem(SELECTED_ENDPOINT_KEY)
-    if (stored) {
-      setSelectedEndpoint(stored)
-    }
-  }, [])
-
-  const handleEndpointSelect = (endpoint: string) => {
-    setSelectedEndpoint(endpoint)
-    localStorage.setItem(SELECTED_ENDPOINT_KEY, endpoint)
-  }
-
+export default function Page() {
   return (
-    <div className="flex h-full">
-      <ResizableSidebar>
-        <EndpointSelector
-          selectedEndpoint={selectedEndpoint}
-          onEndpointSelect={handleEndpointSelect}
-        />
-      </ResizableSidebar>
-      <main className="flex-1 min-w-0">
-        <Suspense fallback={
-          <div className="h-full w-full flex items-center justify-center">
-            <Icons.spinner className="h-8 w-8 animate-spin" />
-          </div>
-        }>
-          <Canvas />
-        </Suspense>
-      </main>
-    </div>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <header className="flex sticky top-0 bg-background h-16 shrink-0 items-center gap-2 border-b px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="mr-2 h-4" />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href="#">
+                  Building Your Application
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Data Fetching</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4">
+          {Array.from({ length: 24 }).map((_, index) => (
+            <div
+              key={index}
+              className="aspect-video h-12 w-full rounded-lg bg-muted/50"
+            />
+          ))}
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
