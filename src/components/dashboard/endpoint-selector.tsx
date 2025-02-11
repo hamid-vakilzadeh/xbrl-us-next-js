@@ -1,18 +1,20 @@
 'use client'
 
+import { memo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useXBRLMeta } from '@/hooks/use-xbrl-meta'
 import { Combobox } from '@/components/ui/combobox'
 import { Icons } from '@/components/shared/Icons'
 import { Button } from '@/components/ui/Button'
 import { Alert, AlertDescription } from '@/components/ui/Alert'
+import { useDashboardStore } from '@/store/dashboard'
 
 interface EndpointSelectorProps {
+  selectedEndpoint: string | undefined
   onEndpointSelect: (endpoint: string) => void
-  selectedEndpoint?: string
 }
 
-export function EndpointSelector({ onEndpointSelect, selectedEndpoint }: EndpointSelectorProps) {
+export const EndpointSelector = memo(function EndpointSelector({ selectedEndpoint, onEndpointSelect }: EndpointSelectorProps) {
   const router = useRouter()
   const { meta, isLoading, error } = useXBRLMeta()
 
@@ -70,4 +72,4 @@ export function EndpointSelector({ onEndpointSelect, selectedEndpoint }: Endpoin
       />
     </div>
   )
-}
+})

@@ -1,71 +1,42 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
-import { cn } from '@/lib/utils'
+import React, { useCallback, memo } from 'react'
+import { useDashboardStore } from '@/store/dashboard'
 
 interface ResizableSidebarProps {
   children: React.ReactNode
-  defaultWidth?: number
-  minWidth?: number
-  maxWidth?: number
-  className?: string
 }
 
-export function ResizableSidebar({
-  children,
-  defaultWidth = 320,
-  minWidth = 240,
-  maxWidth = 480,
-  className
-}: ResizableSidebarProps) {
-  const [isResizing, setIsResizing] = useState(false)
-  const [sidebarWidth, setSidebarWidth] = useState(defaultWidth)
-
-  const startResizing = useCallback(() => {
-    setIsResizing(true)
-  }, [])
-
-  const stopResizing = useCallback(() => {
-    setIsResizing(false)
-  }, [])
-
-  const resize = useCallback(
-    (e: MouseEvent) => {
-      if (isResizing) {
-        const newWidth = e.clientX
-        if (newWidth >= minWidth && newWidth <= maxWidth) {
-          setSidebarWidth(newWidth)
-        }
+export const ResizableSidebar = memo(function ResizableSidebar({ children }: ResizableSidebarProps) {
+  const { sidebarWidth, setSidebarWidth } = useDashboardStore()
+  
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault()
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      const newWidth = e.clientX
+      if (newWidth >= 200 && newWidth <= 600) {
+        setSidebarWidth(newWidth)
       }
-    },
-    [isResizing, minWidth, maxWidth]
-  )
-
-  useEffect(() => {
-    if (isResizing) {
-      window.addEventListener('mousemove', resize)
-      window.addEventListener('mouseup', stopResizing)
     }
 
-    return () => {
-      window.removeEventListener('mousemove', resize)
-      window.removeEventListener('mouseup', stopResizing)
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
     }
-  }, [isResizing, resize, stopResizing])
+
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+  }, [setSidebarWidth])
 
   return (
-    <div
-      className={cn(
-        'relative flex-none bg-background border-r',
-        className
-      )}
-      style={{ width: sidebarWidth }}
-    >
-      {children}
-      <div
-        className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-muted active:bg-muted"
-        onMouseDown={startResizing}
+    <div className="relative flex-shrink-0" style={{ width: sidebarWidth }}>
+      <div className="absolute inset-y-0 right-0 w-1 cursor-col-resize bg-border hover:bg-primary/50 transition-colors"
+           onMouseDown={handleMouseDown}
       />
+      <div className="h-full overflow-auto border-r bg-background">
+        {children}
+      </div>
     </div>
   )
-}
+})
