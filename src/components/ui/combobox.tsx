@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/Button"
 import {
@@ -55,7 +54,13 @@ export function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("w-full justify-between", className)}
+          className={cn(
+            "w-full justify-between",
+            "bg-combobox-trigger text-foreground",
+            "hover:bg-combobox-trigger-hover",
+            "border border-input shadow-sm",
+            className
+          )}
         >
           {currentValue
             ? options.find((option) => option.value === currentValue)?.label
@@ -63,9 +68,20 @@ export function Combobox({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className={cn("p-0", className)}>
-        <Command>
-          <CommandInput placeholder={placeholder} />
+      <PopoverContent 
+        className={cn(
+          "w-[--radix-popover-trigger-width] p-0",
+          "bg-popover border border-input shadow-md",
+          className
+        )}
+        align="start"
+        sideOffset={4}
+      >
+        <Command className="w-full">
+          <CommandInput 
+            placeholder={placeholder}
+            className="bg-combobox-input"
+          />
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
             <CommandGroup>
@@ -79,6 +95,12 @@ export function Combobox({
                     onSelect(newValue)
                     setOpen(false)
                   }}
+                  className={cn(
+                    "cursor-pointer",
+                    "aria-selected:bg-combobox-option-selected",
+                    "hover:bg-combobox-option-hover",
+                    "data-[selected]:bg-combobox-option-selected"
+                  )}
                 >
                   <Check
                     className={cn(

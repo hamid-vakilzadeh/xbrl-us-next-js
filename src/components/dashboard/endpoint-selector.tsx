@@ -59,17 +59,25 @@ export const EndpointSelector = memo(function EndpointSelector({ selectedEndpoin
   }))
 
   return (
-    <div className="p-4">
-      <h2 className="text-sm font-medium mb-2">
-        XBRL API Endpoints
-      </h2>
-      <Combobox
-        options={options}
-        value={selectedEndpoint}
-        onSelect={onEndpointSelect}
-        placeholder="Search endpoints..."
-        emptyText="No endpoints found."
-      />
+    <div className="p-4 w-full space-y-4">
+      <div className="space-y-2">
+        <h2 className="text-sm font-medium">
+          XBRL API Endpoints
+        </h2>
+        <p className="text-xs text-muted-foreground">
+          Select an endpoint to view its data
+        </p>
+      </div>
+      <div className="relative w-full">
+        <Combobox
+          options={options}
+          value={selectedEndpoint}
+          onSelect={onEndpointSelect}
+          placeholder="Search endpoints..."
+          emptyText="No endpoints found."
+          className="w-full"
+        />
+      </div>
     </div>
   )
 })
