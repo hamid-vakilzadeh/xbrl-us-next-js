@@ -12,7 +12,7 @@ import { sidebarConfig } from '@/config/dashboard'
 
 export const EndpointSelector = memo(function EndpointSelector() {
   const router = useRouter()
-  const { meta, isLoading, error } = useXBRLMeta()
+  const { meta, endpointsMeta, isLoading, error } = useXBRLMeta()
   const { selectedEndpoint, setSelectedEndpoint } = useDashboardStore()
 
   if (isLoading) {
@@ -50,16 +50,29 @@ export const EndpointSelector = memo(function EndpointSelector() {
     )
   }
 
-  const options = Object.entries(meta).map(([key, value]) => ({
-    value: key,
-    label: `${key} (${value.object})`
-  }))
+  const options = Object.entries(meta).map(([key, value]) => {
+    let label = `${key} (${value.object})`
+    const metadata = endpointsMeta?.[key as keyof typeof endpointsMeta]
+    
+    // Add metadata indicators if available
+    if (metadata) {
+      const endpoints = metadata.endpoints ? Object.keys(metadata.endpoints).length : 0
+      const examples = metadata.examples ? Object.keys(metadata.examples).length : 0
+      const fields = metadata.fields ? Object.keys(metadata.fields).length : 0
+      label += ` - ${endpoints} endpoints, ${examples} examples, ${fields} fields`
+    }
+    
+    return {
+      value: key,
+      label
+    }
+  })
 
   return (
     <div 
       className="w-full space-y-4 p-4" 
       style={{ 
-        minWidth: sidebarConfig.minWidth - (2 * sidebarConfig.padding.x * 4), // Account for parent padding
+        minWidth: sidebarConfig.minWidth - (2 * sidebarConfig.padding.x * 4),
         maxWidth: sidebarConfig.maxWidth - (2 * sidebarConfig.padding.x * 4)
       }}
     >
@@ -67,9 +80,21 @@ export const EndpointSelector = memo(function EndpointSelector() {
         <h2 className="text-sm font-medium text-foreground">
           XBRL API Endpoints
         </h2>
-        <p className="text-xs text-muted-foreground">
-          Select an endpoint to view its data
-        </p>
+        {selectedEndpoint && endpointsMeta?.[selectedEndpoint] && (
+          <p className="text-xs text-muted-foreground">
+            {endpointsMeta[selectedEndpoint].endpoints && 
+              `Available endpoints: ${Object.keys(endpointsMeta[selectedEndpoint].endpoints!).length}`}
+            {endpointsMeta[selectedEndpoint].examples && 
+              `, Example queries: ${Object.keys(endpointsMeta[selectedEndpoint].examples!).length}`}
+            {endpointsMeta[selectedEndpoint].fields && 
+              `, Fields: ${Object.keys(endpointsMeta[selectedEndpoint].fields!).length}`}
+          </p>
+        )}
+        {!endpointsMeta?.[selectedEndpoint ?? ''] && selectedEndpoint && (
+          <p className="text-xs text-muted-foreground">
+            Metadata not available for this endpoint
+          </p>
+        )}
       </div>
       <div className="relative w-full">
         <Combobox
