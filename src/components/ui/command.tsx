@@ -4,7 +4,6 @@ import * as React from "react"
 import { type DialogProps } from "@radix-ui/react-dialog"
 import { Command as CommandPrimitive } from "cmdk"
 import { Search } from "lucide-react"
-
 import { cn } from "@/lib/utils"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 
@@ -15,8 +14,7 @@ const Command = React.forwardRef<
   <CommandPrimitive
     ref={ref}
     className={cn(
-      "flex h-full w-full flex-col overflow-hidden rounded-md",
-      "bg-popover text-popover-foreground",
+      "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
       className
     )}
     {...props}
@@ -46,9 +44,8 @@ const CommandInput = React.forwardRef<
       ref={ref}
       className={cn(
         "flex h-10 w-full rounded-md py-3 text-sm outline-none",
-        "placeholder:text-muted-foreground",
+        "bg-transparent placeholder:text-muted-foreground",
         "disabled:cursor-not-allowed disabled:opacity-50",
-        "bg-transparent",
         className
       )}
       {...props}
@@ -122,12 +119,18 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+      "relative flex select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none",
+      "cursor-pointer transition-colors duration-150",
+      "hover:bg-accent hover:text-accent-foreground",
       "aria-selected:bg-accent aria-selected:text-accent-foreground",
       "data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      "transition-colors",
+      "data-[selected]:bg-accent data-[selected]:text-accent-foreground",
       className
     )}
+    onMouseDown={(e) => {
+      // Prevent the button from losing focus
+      e.preventDefault()
+    }}
     {...props}
   />
 ))

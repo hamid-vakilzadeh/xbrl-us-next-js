@@ -17,6 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { useDashboardStore } from "@/store/dashboard"
 
 export interface ComboboxOption {
   value: string
@@ -42,6 +43,8 @@ export function Combobox({
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [currentValue, setCurrentValue] = React.useState(value || "")
+  const { sidebarWidth } = useDashboardStore()
+  const triggerRef = React.useRef<HTMLButtonElement>(null)
 
   React.useEffect(() => {
     setCurrentValue(value || "")
@@ -51,36 +54,42 @@ export function Combobox({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          ref={triggerRef}
           variant="outline"
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "w-full justify-between",
-            "bg-combobox-trigger text-foreground",
-            "hover:bg-combobox-trigger-hover",
+            "w-full min-h-[40px] justify-between",
+            "bg-background text-foreground",
+            "hover:bg-accent hover:text-accent-foreground",
             "border border-input shadow-sm",
+            "transition-colors duration-150",
             className
           )}
         >
-          {currentValue
-            ? options.find((option) => option.value === currentValue)?.label
-            : placeholder}
+          <span className="flex-1 truncate text-left">
+            {currentValue
+              ? options.find((option) => option.value === currentValue)?.label
+              : placeholder}
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent 
         className={cn(
-          "w-[--radix-popover-trigger-width] p-0",
-          "bg-popover border border-input shadow-md",
-          className
+          "p-0 shadow-md",
+          "bg-popover border border-input",
         )}
+        style={{ 
+          width: triggerRef.current?.offsetWidth || sidebarWidth - 32 // 32px accounts for sidebar padding
+        }}
         align="start"
         sideOffset={4}
       >
         <Command className="w-full">
           <CommandInput 
             placeholder={placeholder}
-            className="bg-combobox-input"
+            className="bg-transparent"
           />
           <CommandList>
             <CommandEmpty>{emptyText}</CommandEmpty>
@@ -90,16 +99,15 @@ export function Combobox({
                   key={option.value}
                   value={option.value}
                   onSelect={(currentValue) => {
-                    const newValue = currentValue === value ? "" : currentValue
-                    setCurrentValue(newValue)
-                    onSelect(newValue)
+                    onSelect(currentValue)
+                    setCurrentValue(currentValue)
                     setOpen(false)
                   }}
                   className={cn(
                     "cursor-pointer",
-                    "aria-selected:bg-combobox-option-selected",
-                    "hover:bg-combobox-option-hover",
-                    "data-[selected]:bg-combobox-option-selected"
+                    "hover:bg-accent hover:text-accent-foreground",
+                    "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                    "data-[selected]:bg-accent data-[selected]:text-accent-foreground"
                   )}
                 >
                   <Check
@@ -108,7 +116,7 @@ export function Combobox({
                       currentValue === option.value ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  {option.label}
+                  <span className="flex-1 truncate">{option.label}</span>
                 </CommandItem>
               ))}
             </CommandGroup>

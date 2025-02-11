@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { sidebarConfig } from '@/config/dashboard'
 
 interface DashboardState {
   selectedEndpoint: string | undefined
@@ -16,11 +17,16 @@ export const useDashboardStore = create<DashboardState>()(
   persist(
     (set) => ({
       selectedEndpoint: undefined,
-      sidebarWidth: 250,
+      sidebarWidth: sidebarConfig.defaultWidth,
       isCanvasLoading: false,
       canvasData: null,
       setSelectedEndpoint: (endpoint) => set({ selectedEndpoint: endpoint }),
-      setSidebarWidth: (width) => set({ sidebarWidth: width }),
+      setSidebarWidth: (width) => set({ 
+        sidebarWidth: Math.min(
+          Math.max(width, sidebarConfig.minWidth),
+          sidebarConfig.maxWidth
+        ) 
+      }),
       setCanvasLoading: (loading) => set({ isCanvasLoading: loading }),
       setCanvasData: (data) => set({ canvasData: data }),
     }),

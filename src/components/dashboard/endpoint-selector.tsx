@@ -8,15 +8,12 @@ import { Icons } from '@/components/shared/Icons'
 import { Button } from '@/components/ui/Button'
 import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { useDashboardStore } from '@/store/dashboard'
+import { sidebarConfig } from '@/config/dashboard'
 
-interface EndpointSelectorProps {
-  selectedEndpoint: string | undefined
-  onEndpointSelect: (endpoint: string) => void
-}
-
-export const EndpointSelector = memo(function EndpointSelector({ selectedEndpoint, onEndpointSelect }: EndpointSelectorProps) {
+export const EndpointSelector = memo(function EndpointSelector() {
   const router = useRouter()
   const { meta, isLoading, error } = useXBRLMeta()
+  const { selectedEndpoint, setSelectedEndpoint } = useDashboardStore()
 
   if (isLoading) {
     return (
@@ -59,9 +56,15 @@ export const EndpointSelector = memo(function EndpointSelector({ selectedEndpoin
   }))
 
   return (
-    <div className="p-4 w-full space-y-4">
+    <div 
+      className="w-full space-y-4 p-4" 
+      style={{ 
+        minWidth: sidebarConfig.minWidth - (2 * sidebarConfig.padding.x * 4), // Account for parent padding
+        maxWidth: sidebarConfig.maxWidth - (2 * sidebarConfig.padding.x * 4)
+      }}
+    >
       <div className="space-y-2">
-        <h2 className="text-sm font-medium">
+        <h2 className="text-sm font-medium text-foreground">
           XBRL API Endpoints
         </h2>
         <p className="text-xs text-muted-foreground">
@@ -72,7 +75,7 @@ export const EndpointSelector = memo(function EndpointSelector({ selectedEndpoin
         <Combobox
           options={options}
           value={selectedEndpoint}
-          onSelect={onEndpointSelect}
+          onSelect={setSelectedEndpoint}
           placeholder="Search endpoints..."
           emptyText="No endpoints found."
           className="w-full"
