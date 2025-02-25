@@ -1,11 +1,64 @@
 'use client'
 
 import React, { useState, useCallback, useTransition } from 'react';
-import { FactCards, FactQuery } from '@/components/query/fact';
+import { 
+  FactCards, 
+  FactHasDimensions, 
+  FactIsExtended, 
+  FactUltimus, 
+  FactQuery,
+ } from '@/components/query/fact';
+import { 
+  EntityId, 
+  EntityCik,
+  EntityTicker,
+ } from '@/components/query/entity';
 import { Card } from '@/components/ui/Card';
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 
+
+
+const FACT_ENDPOINT_CONFIG = {
+    "fact.has-dimensions": {
+      "component": FactHasDimensions,
+      "has_endpoint_config": false
+    },
+    "fact.is-extended": {
+      "component": FactIsExtended,
+      "has_endpoint_config": false
+    },
+    "fact.ultimus": {
+      "component": FactUltimus,
+      "has_endpoint_config": false
+    },
+    "fact.id": {
+      "component": "TBD",
+      "has_endpoint_config": true,
+      "endpoint_config": [
+      {
+        "endpoint_id": "1",
+        "filter-method": "multi",
+      }, 
+      {
+        "endpoint_id": "2",
+        "filter-method": "single",
+      }], 
+    },
+    "entity.id": {
+        "component": EntityId,
+        "has_endpoint_config": true,
+        "endpoint_config": [
+        {
+          "endpoint_id": "1",
+          "filter-method": "multi",
+        }, 
+        {
+          "endpoint_id": "2",
+          "filter-method": "single",
+        }], 
+      },     
+    }
 
 const QueryBuilder = () => {
   const [isPending, startTransition] = useTransition();

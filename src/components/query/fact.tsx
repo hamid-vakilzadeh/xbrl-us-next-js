@@ -51,7 +51,7 @@ const FACT_FIELDS = {
         "database_field": "fact_id",
         "definition": "The unique identifier used to identify a fact.",
         "format": "integer"
-      },
+        },
       "fact.inline-display-value": {
         "searchable": false,
         "type": "varchar",
