@@ -6,8 +6,6 @@ import {
   FactHasDimensions,
   FactIsExtended,
   FactUltimus,
-  FactInlineIsHidden,
-  FactInlineNegated
 } from '@/components/query/fact';
 import { 
   EntityId, 
