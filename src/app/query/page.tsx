@@ -97,8 +97,10 @@ const QueryBuilder = () => {
         .map(id => [id, fieldValues[id]])
     );
 
+    const endpoint = selectedEndpoint === '1' ? 'fact/search' : 'fact/{fact.id}';
+
     return {
-      method: selectedEndpoint,
+      method: endpoint,
       fields,
       parameters
     };

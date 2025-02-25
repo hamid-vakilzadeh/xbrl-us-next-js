@@ -1,4 +1,5 @@
 import { XBRLMeta } from './meta'
+import { useQuery } from '@tanstack/react-query'
 
 interface FactSearchParams {
   endpoint: 'fact/search' | 'fact/oim/search'
@@ -84,6 +85,22 @@ export async function getFactById(accessToken: string, factId: string | number):
   }
 
   return await response.json()
+}
+
+export function useSearchFacts(accessToken: string, params: FactSearchParams) {
+  return useQuery({
+    queryKey: ['facts', 'search', params],
+    queryFn: () => searchFacts(accessToken, params),
+    enabled: !!accessToken,
+  })
+}
+
+export function useFactById(accessToken: string, factId: string | number) {
+  return useQuery({
+    queryKey: ['facts', 'byId', factId],
+    queryFn: () => getFactById(accessToken, factId),
+    enabled: !!accessToken && !!factId,
+  })
 }
 
 export type { FactSearchParams, FactResponse }
