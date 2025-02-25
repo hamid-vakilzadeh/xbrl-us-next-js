@@ -290,6 +290,99 @@ TextQueryCardComponent.displayName = 'TextQueryCard';
 
 export const TextQueryCard: QueryCardComponent = Object.assign(TextQueryCardComponent, { id: 'text-query-card' });
 
+interface BooleanFieldConfig {
+  label?: string;
+  definition: string;
+  searchable: boolean;
+  type: string;
+  database_field: string;
+  format: string;
+}
+
+interface BooleanQueryCardProps extends QueryCardProps {
+  field: BooleanFieldConfig;
+}
+
+export const BooleanQueryCard = ({ 
+    value, 
+    onChange, 
+    enabled, 
+    selected, 
+    onSelect,
+    filterEnabled,
+    onFilterToggle,
+    isLoading,
+    title,
+    description,
+    id,
+    field
+}: BooleanQueryCardProps) => {
+    return (
+        <Card 
+            id={id} 
+            role="region" 
+            aria-label={title}
+            className="transition-all duration-200 hover:shadow-md"
+        >
+            <div className="p-4">
+                <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3 flex-1">
+                        <div className="pt-1">
+                            <CheckboxWithLabel
+                                id={`select-${id}`}
+                                label=""
+                                checked={selected}
+                                onChange={onSelect}
+                                isLoading={isLoading}
+                            />
+                        </div>
+                        <div>
+                            <h1 className="text-lg font-medium">{title}</h1>
+                            <p className="text-sm text-gray-600 mt-0.5">{description}</p>
+                        </div>
+                    </div>
+                    <div className={cn(
+                        "transition-all duration-300 ease-out",
+                        field.searchable && selected 
+                            ? "opacity-100 translate-x-0" 
+                            : "opacity-0 translate-x-4 pointer-events-none"
+                    )}>
+                        {field.searchable && (
+                            <CheckboxWithLabel
+                                id={`filter-${id}`}
+                                label="Enable filter"
+                                checked={filterEnabled}
+                                onChange={onFilterToggle}
+                                isLoading={isLoading}
+                            />
+                        )}
+                    </div>
+                </div>
+                
+                <div className={cn(
+                    "overflow-hidden transition-all duration-300 ease-out",
+                    filterEnabled ? "max-h-24 opacity-100" : "max-h-0 opacity-0"
+                )}>
+                    {field.searchable && selected && filterEnabled && (
+                        <div className="pl-9 transform transition-all duration-300">
+                            <BooleanFilter
+                                value={value}
+                                onChange={onChange}
+                                enabled={enabled}
+                                isLoading={isLoading}
+                            />
+                        </div>
+                    )}
+                </div>
+            </div>
+        </Card>
+    );
+};
+
+BooleanQueryCard.id = 'boolean-query-card';
+
+export type { BooleanFieldConfig, BooleanQueryCardProps };
+
 interface Endpoint {
     label: string;
     description: string;
