@@ -10,7 +10,6 @@ import {
   FactInlineNegated
 } from '@/components/query/fact';
 import { 
-  EntityCards,
   EntityId, 
   EntityCik,
   EntityTicker,
@@ -147,18 +146,6 @@ const QueryBuilder = () => {
           />
         </div>
 
-        <Separator className="my-6" />
-
-        <EntityCards
-          values={fieldValues}
-          onChange={handleFieldChange}
-          enabledFields={enabledFields}
-          selectedFields={selectedFields}
-          onSelectField={handleFieldSelect}
-          filterEnabledFields={filterEnabledFields}
-          onFilterToggle={handleFilterToggle}
-          isLoading={isPending}
-        />
       </FactQuery>
 
       <Card className="mt-8">
