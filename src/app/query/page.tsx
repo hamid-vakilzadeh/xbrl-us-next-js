@@ -21,7 +21,14 @@ import { Badge } from "@/components/ui/badge";
 const QueryBuilder = () => {
   const [isPending, startTransition] = useTransition();
   const [selectedEndpoint, setSelectedEndpoint] = useState('1');
-  const [enabledFields] = useState<Set<string>>(new Set(['fact.has-dimensions', 'fact.is-extended', 'fact.ultimus']));
+  const [enabledFields] = useState<Set<string>>(new Set([
+    'fact.has-dimensions', 
+    'fact.is-extended', 
+    'fact.ultimus',
+    'entity.id',
+    'entity.cik',
+    'entity.ticker'
+  ]));
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
   const [filterEnabledFields, setFilterEnabledFields] = useState<Set<string>>(new Set());
