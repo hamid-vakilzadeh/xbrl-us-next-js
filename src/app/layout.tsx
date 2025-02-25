@@ -27,11 +27,11 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <div className="relative flex min-h-screen flex-col">
-            <Header />
+            {/*<Header />*/}
             <main className="flex-1">
               {children}
             </main>
-            <Footer />
+            {/*<Footer />*/}
           </div>
         </AuthProvider>
       </body>
