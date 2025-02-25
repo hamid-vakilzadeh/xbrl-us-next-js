@@ -1,8 +1,11 @@
-import React, { Children } from 'react';
-import { Card } from "@/components/ui/Card";
-import { cn } from "@/lib/utils";
-import { CheckboxWithLabel, BooleanFilter, QueryCardComponent, EndpointTabs } from "@/components/query/base";
-import { BooleanQueryCard, QueryCardProps, BooleanFieldConfig } from './base';
+import React from 'react';
+import {QueryCardProps } from "@/components/query/queryCards/queryCard";
+import {EndpointTabs} from "@/components/query/queryCards/endpointCard";
+import {
+    BooleanQueryCard, 
+    BooleanFieldConfig
+} from "@/components/query/queryCards/booleanCard";
+
 import { FACT } from '@/store/meta/fact';
 
 const FACT_ENDPOINTS = {

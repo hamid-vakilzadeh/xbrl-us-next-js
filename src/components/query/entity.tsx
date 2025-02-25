@@ -1,5 +1,6 @@
 import React from 'react';
-import { TextQueryCard, QueryCardComponent } from "@/components/query/base";
+import { TextQueryCard } from "@/components/query/queryCards/textCard";
+import type { QueryCardComponent } from '@/components/query/queryCards/queryCard';
 
 const ENTITY_FIELDS = {
     "entity.cik": {
