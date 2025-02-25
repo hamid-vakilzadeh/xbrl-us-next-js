@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useAuth } from '@/components/auth/auth-provider'
-import { searchFacts, getFactById, type FactSearchParams, type FactResponse } from '@/lib/api/facts'
+import { searchFacts, getFactById, type FactSearchParams, type FactResponse } from '@/api/facts'
 
 interface UseFactsResult {
   isLoading: boolean

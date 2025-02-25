@@ -1,7 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
-import { refreshXBRLToken } from '@/lib/api/auth'
+import { refreshXBRLToken } from '@/api/auth'
 
 interface XBRLUser {
   email: string

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useCallback, useTransition, useEffect } from 'react';
 import { useAuth } from '@/components/auth/auth-provider';
-import { useSearchFacts } from '@/lib/api/facts';
+import { useSearchFacts } from '@/api/facts';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,7 +15,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { 
-  FactQuery, 
+  FactQuery,
+  FactDecimals,
   FactHasDimensions,
   FactIsExtended,
   FactUltimus,
@@ -194,6 +195,16 @@ const QueryBuilder = () => {
                     onEndpointChange={field.onChange}
                   >
                     <div className="space-y-4">
+                      <FactDecimals
+                        value={fieldValues[FactDecimals.id] || ''}
+                        onChange={(value) => handleFieldChange(FactDecimals.id, value)}
+                        enabled={enabledFields.has(FactDecimals.id)}
+                        selected={selectedFields.has(FactDecimals.id)}
+                        onSelect={(selected) => handleFieldSelect(FactDecimals.id, selected)}
+                        filterEnabled={filterEnabledFields.has(FactDecimals.id)}
+                        onFilterToggle={(enabled) => handleFilterToggle(FactDecimals.id, enabled)}
+                        isLoading={isPending}
+                      />
                       <FactHasDimensions
                         value={fieldValues[FactHasDimensions.id] || ''}
                         onChange={(value) => handleFieldChange(FactHasDimensions.id, value)}
@@ -244,7 +255,7 @@ const QueryBuilder = () => {
                         onFilterToggle={(enabled) => handleFilterToggle(FactInlineNegated.id, enabled)}
                         isLoading={isPending}
                       />
-                      
+
 
                     </div>
                     <div className="space-y-4">

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { authenticateXBRL, refreshXBRLToken, XBRLAuthError } from '@/lib/api/auth';
+import { authenticateXBRL, refreshXBRLToken, XBRLAuthError } from '@/api/auth';
 
 export function useXBRLAuth() {
   const [isLoading, setIsLoading] = useState(false);

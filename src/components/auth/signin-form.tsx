@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { Icons } from '@/components/shared/Icons'
 import { useXBRLAuth } from '@/hooks/use-xbrl-auth'
 import { useAuth } from '@/components/auth/auth-provider'
-import { fetchXBRLMeta, fetchAllEndpointsMeta } from '@/lib/api/meta'
+import { fetchXBRLMeta, fetchAllEndpointsMeta } from '@/api/meta'
 
 export function SignInForm() {
   const { signIn: signInXBRL, isLoading, error } = useXBRLAuth()

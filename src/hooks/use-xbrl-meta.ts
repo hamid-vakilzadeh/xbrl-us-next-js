@@ -9,7 +9,7 @@ import {
   getStoredEndpointsMeta, 
   type XBRLMeta, 
   type AllEndpointsMetadata 
-} from '@/lib/api/meta'
+} from '@/api/meta'
 
 interface UseXBRLMetaResult {
   meta: XBRLMeta | null
