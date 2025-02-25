@@ -145,6 +145,40 @@ const QueryBuilder = () => {
             isLoading={isPending}
           />
         </div>
+        <div>
+          <EntityId
+            value={fieldValues[EntityId.id] || ''}
+            onChange={(value) => handleFieldChange(EntityId.id, value)}
+            enabled={enabledFields.has(EntityId.id)}
+            selected={selectedFields.has(EntityId.id)}
+            onSelect={(selected) => handleFieldSelect(EntityId.id, selected)}
+            filterEnabled={filterEnabledFields.has(EntityId.id)}
+            onFilterToggle={(enabled) => handleFilterToggle(EntityId.id, enabled)}
+            isLoading={isPending}
+          />
+
+          <EntityCik
+            value={fieldValues[EntityCik.id] || ''}
+            onChange={(value) => handleFieldChange(EntityCik.id, value)}
+            enabled={enabledFields.has(EntityCik.id)}
+            selected={selectedFields.has(EntityCik.id)}
+            onSelect={(selected) => handleFieldSelect(EntityCik.id, selected)}
+            filterEnabled={filterEnabledFields.has(EntityCik.id)}
+            onFilterToggle={(enabled) => handleFilterToggle(EntityCik.id, enabled)}
+            isLoading={isPending}
+          />
+
+          <EntityTicker
+            value={fieldValues[EntityTicker.id] || ''}
+            onChange={(value) => handleFieldChange(EntityTicker.id, value)}
+            enabled={enabledFields.has(EntityTicker.id)}
+            selected={selectedFields.has(EntityTicker.id)}
+            onSelect={(selected) => handleFieldSelect(EntityTicker.id, selected)}
+            filterEnabled={filterEnabledFields.has(EntityTicker.id)}
+            onFilterToggle={(enabled) => handleFilterToggle(EntityTicker.id, enabled)}
+            isLoading={isPending}
+          />
+        </div>
 
       </FactQuery>
 
