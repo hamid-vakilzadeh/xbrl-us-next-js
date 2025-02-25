@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Children } from 'react';
 import { Card } from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
 import { CheckboxWithLabel, BooleanFilter, QueryCardComponent, EndpointTabs } from "@/components/query/base";
@@ -512,94 +512,17 @@ export const FactInlineNegated: QueryCardComponent = ({
 };
 FactInlineNegated.id = "fact.inline-negated";
 
-// Array of all boolean fact components for easy mapping
-const booleanFactComponents = [
-    FactHasDimensions,
-    FactIsExtended,
-    FactUltimus,
-    FactInlineIsHidden,
-    FactInlineNegated
-];
-
-interface FactCardsProps {
-    values: Record<string, string>;
-    onChange: (id: string, value: string) => void;
-    enabledFields: Set<string>;
-    selectedFields: Set<string>;
-    onSelectField: (id: string, selected: boolean) => void;
-    filterEnabledFields: Set<string>;
-    onFilterToggle: (id: string, enabled: boolean) => void;
-    isLoading?: boolean;
-}
-
-export const FactCards: React.FC<FactCardsProps> = ({ 
-    values, 
-    onChange, 
-    enabledFields, 
-    selectedFields,
-    onSelectField,
-    filterEnabledFields,
-    onFilterToggle,
-    isLoading
-}) => {
-    const getActiveFiltersCount = () => {
-        return Array.from(filterEnabledFields).filter(id => 
-            values[id] && values[id] !== 'any'
-        ).length;
-    };
-
-    return (
-        <div className="space-y-8">
-            <div>
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold">Boolean Fact Fields</h2>
-                    {selectedFields.size > 0 && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <span>{selectedFields.size} selected</span>
-                            {getActiveFiltersCount() > 0 && (
-                                <span className="px-2 py-0.5 bg-green-50 text-green-700 rounded-full border border-green-200">
-                                    {getActiveFiltersCount()} active filters
-                                </span>
-                            )}
-                        </div>
-                    )}
-                </div>
-                <div className="space-y-3">
-                    {booleanFactComponents.map((FactComponent) => (
-                        <div 
-                            key={FactComponent.id}
-                            className={cn(
-                                'transition-opacity duration-200',
-                                !selectedFields.has(FactComponent.id) && 'opacity-80 hover:opacity-100'
-                            )}
-                        >
-                            <FactComponent
-                                value={values[FactComponent.id] || 'any'}
-                                onChange={(value) => onChange(FactComponent.id, value)}
-                                enabled={enabledFields.has(FactComponent.id)}
-                                selected={selectedFields.has(FactComponent.id)}
-                                onSelect={(selected) => onSelectField(FactComponent.id, selected)}
-                                filterEnabled={filterEnabledFields.has(FactComponent.id)}
-                                onFilterToggle={(enabled) => onFilterToggle(FactComponent.id, enabled)}
-                                isLoading={isLoading}
-                            />
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
-};
-
 interface FactQueryProps {
     selectedEndpoint: string;
     onEndpointChange: (endpointId: string) => void;
+    children?: React.ReactNode;
     // ... other props
 }
 
 export const FactQuery: React.FC<FactQueryProps> = ({
     selectedEndpoint,
     onEndpointChange,
+    children,
     // ... other props
 }) => {
     return (
@@ -609,7 +532,8 @@ export const FactQuery: React.FC<FactQueryProps> = ({
                 selectedEndpoint={selectedEndpoint}
                 onEndpointChange={onEndpointChange}
             />
-            {/* ... rest of your fact query components ... */}
+            {/* ... rest of fact query components ... */}
+            {children}
         </div>
     );
 };

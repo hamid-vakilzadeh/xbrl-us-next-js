@@ -2,67 +2,26 @@
 
 import React, { useState, useCallback, useTransition } from 'react';
 import { 
-  FactCards, 
-  FactHasDimensions, 
-  FactIsExtended, 
-  FactUltimus, 
-  FactQuery,
- } from '@/components/query/fact';
+  FactQuery, 
+  FactHasDimensions,
+  FactIsExtended,
+  FactUltimus,
+  FactInlineIsHidden,
+  FactInlineNegated
+} from '@/components/query/fact';
 import { 
+  EntityCards,
   EntityId, 
   EntityCik,
   EntityTicker,
- } from '@/components/query/entity';
+} from '@/components/query/entity';
 import { Card } from '@/components/ui/Card';
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 
-
-
-const FACT_ENDPOINT_CONFIG = {
-    "fact.has-dimensions": {
-      "component": FactHasDimensions,
-      "has_endpoint_config": false
-    },
-    "fact.is-extended": {
-      "component": FactIsExtended,
-      "has_endpoint_config": false
-    },
-    "fact.ultimus": {
-      "component": FactUltimus,
-      "has_endpoint_config": false
-    },
-    "fact.id": {
-      "component": "TBD",
-      "has_endpoint_config": true,
-      "endpoint_config": [
-      {
-        "endpoint_id": "1",
-        "filter-method": "multi",
-      }, 
-      {
-        "endpoint_id": "2",
-        "filter-method": "single",
-      }], 
-    },
-    "entity.id": {
-        "component": EntityId,
-        "has_endpoint_config": true,
-        "endpoint_config": [
-        {
-          "endpoint_id": "1",
-          "filter-method": "multi",
-        }, 
-        {
-          "endpoint_id": "2",
-          "filter-method": "single",
-        }], 
-      },     
-    }
-
 const QueryBuilder = () => {
   const [isPending, startTransition] = useTransition();
-  const [selectedMethod, setselectedMethod] = useState('fact');
+  const [selectedEndpoint, setSelectedEndpoint] = useState('1');
   const [enabledFields] = useState<Set<string>>(new Set(['fact.has-dimensions', 'fact.is-extended', 'fact.ultimus']));
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set());
   const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
@@ -80,20 +39,17 @@ const QueryBuilder = () => {
   const handleFieldSelect = useCallback((id: string, selected: boolean) => {
     startTransition(() => {
       if (!selected) {
-        // First disable the filter if it's enabled
         setFilterEnabledFields(prev => {
           const next = new Set(prev);
           next.delete(id);
           return next;
         });
-        // Then clear any filter values
         setFieldValues(prev => {
           const next = { ...prev };
           delete next[id];
           return next;
         });
       }
-      // Finally update selection
       setSelectedFields(prev => {
         const next = new Set(prev);
         if (selected) {
@@ -112,14 +68,12 @@ const QueryBuilder = () => {
         const next = new Set(prev);
         if (enabled) {
           next.add(id);
-          // Set default value to "any" when enabling filter
           setFieldValues(prev => ({
             ...prev,
             [id]: 'any'
           }));
         } else {
           next.delete(id);
-          // Clear filter value when filter is disabled
           setFieldValues(prev => {
             const next = { ...prev };
             delete next[id];
@@ -140,11 +94,11 @@ const QueryBuilder = () => {
     );
 
     return {
-      method: selectedMethod,
+      method: selectedEndpoint,
       fields,
       parameters
     };
-  }, [selectedMethod, selectedFields, filterEnabledFields, fieldValues]);
+  }, [selectedEndpoint, selectedFields, filterEnabledFields, fieldValues]);
 
   const getSummary = useCallback(() => ({
     selectedCount: selectedFields.size,
@@ -153,26 +107,49 @@ const QueryBuilder = () => {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <FactQuery />
       <Separator className="my-6" />
-      <Card className="mb-6">
-        <div className="p-4">
-          <label className="block text-sm font-medium mb-2">Select Method</label>
-          <select
-            value={selectedMethod}
-            onChange={(e) => setselectedMethod(e.target.value)}
-            className="w-full p-2 border rounded-md"
-          >
-            <option value="fact">Fact</option>
-            <option value="report">Report</option>
-          </select>
+      <FactQuery 
+        selectedEndpoint={selectedEndpoint} 
+        onEndpointChange={setSelectedEndpoint}
+      >
+        <div className="space-y-4">
+          <FactHasDimensions
+            value={fieldValues[FactHasDimensions.id] || ''}
+            onChange={(value) => handleFieldChange(FactHasDimensions.id, value)}
+            enabled={enabledFields.has(FactHasDimensions.id)}
+            selected={selectedFields.has(FactHasDimensions.id)}
+            onSelect={(selected) => handleFieldSelect(FactHasDimensions.id, selected)}
+            filterEnabled={filterEnabledFields.has(FactHasDimensions.id)}
+            onFilterToggle={(enabled) => handleFilterToggle(FactHasDimensions.id, enabled)}
+            isLoading={isPending}
+          />
+
+          <FactIsExtended
+            value={fieldValues[FactIsExtended.id] || ''}
+            onChange={(value) => handleFieldChange(FactIsExtended.id, value)}
+            enabled={enabledFields.has(FactIsExtended.id)}
+            selected={selectedFields.has(FactIsExtended.id)}
+            onSelect={(selected) => handleFieldSelect(FactIsExtended.id, selected)}
+            filterEnabled={filterEnabledFields.has(FactIsExtended.id)}
+            onFilterToggle={(enabled) => handleFilterToggle(FactIsExtended.id, enabled)}
+            isLoading={isPending}
+          />
+
+          <FactUltimus
+            value={fieldValues[FactUltimus.id] || ''}
+            onChange={(value) => handleFieldChange(FactUltimus.id, value)}
+            enabled={enabledFields.has(FactUltimus.id)}
+            selected={selectedFields.has(FactUltimus.id)}
+            onSelect={(selected) => handleFieldSelect(FactUltimus.id, selected)}
+            filterEnabled={filterEnabledFields.has(FactUltimus.id)}
+            onFilterToggle={(enabled) => handleFilterToggle(FactUltimus.id, enabled)}
+            isLoading={isPending}
+          />
         </div>
-      </Card>
 
-      <Separator className="my-6" />
+        <Separator className="my-6" />
 
-      <div className="mb-8">
-        <FactCards
+        <EntityCards
           values={fieldValues}
           onChange={handleFieldChange}
           enabledFields={enabledFields}
@@ -182,7 +159,7 @@ const QueryBuilder = () => {
           onFilterToggle={handleFilterToggle}
           isLoading={isPending}
         />
-      </div>
+      </FactQuery>
 
       <Card className="mt-8">
         <div className="p-6">
