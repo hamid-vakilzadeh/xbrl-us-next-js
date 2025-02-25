@@ -16,33 +16,11 @@ interface FactResponse {
   }
 }
 
-const SEARCHABLE_FIELDS = [
-  'concept.balance-type',
-  'concept.id',
-  'concept.is-base',
-  'concept.is-monetary',
-  'concept.local-name',
-  'concept.namespace',
-  'dimension.is-base',
-  'dimension.local-name',
-  'dimension.namespace',
-  'dimensions.count',
-  'dimensions.id'
-] as const
 
 export async function searchFacts(
   accessToken: string,
   { endpoint, fields = ['fact.*'], filters }: FactSearchParams
 ): Promise<FactResponse> {
-  // Validate that filter fields are searchable
-  const invalidFields = Object.keys(filters).filter(
-    field => !SEARCHABLE_FIELDS.includes(field as any)
-  )
-  
-  if (invalidFields.length > 0) {
-    throw new Error(`Invalid search fields: ${invalidFields.join(', ')}. Only ${SEARCHABLE_FIELDS.join(', ')} are searchable.`)
-  }
-
   // Build query string
   const params = new URLSearchParams()
   
@@ -87,11 +65,15 @@ export async function getFactById(accessToken: string, factId: string | number):
   return await response.json()
 }
 
-export function useSearchFacts(accessToken: string, params: FactSearchParams) {
+export function useSearchFacts(
+  accessToken: string, 
+  params: FactSearchParams,
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: ['facts', 'search', params],
     queryFn: () => searchFacts(accessToken, params),
-    enabled: !!accessToken,
+    enabled: !!accessToken && (options?.enabled ?? true),
   })
 }
 
@@ -104,4 +86,3 @@ export function useFactById(accessToken: string, factId: string | number) {
 }
 
 export type { FactSearchParams, FactResponse }
-export { SEARCHABLE_FIELDS }
