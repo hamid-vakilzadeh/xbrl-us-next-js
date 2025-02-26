@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { useXBRLAuth } from '@/hooks/use-xbrl-auth'
 import { useQueryClient } from '@tanstack/react-query'
+import { detectUserLimit } from '@/api/facts'
 
 interface XBRLUser {
   email: string
@@ -54,11 +55,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       setUser(updatedAuth)
       localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedAuth))
+
+      // Prefetch user limit after token refresh
+      queryClient.prefetchQuery({
+        queryKey: ['userLimit'],
+        queryFn: () => detectUserLimit(newTokens.access_token)
+      })
     } catch (error) {
       // If refresh fails, sign out
       await signOut()
     }
-  }, [user, signOut, refreshTokenMutation])
+  }, [user, signOut, refreshTokenMutation, queryClient])
 
   // Load auth state from localStorage on mount
   useEffect(() => {
@@ -81,6 +88,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }
                 setUser(updatedAuth)
                 localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(updatedAuth))
+
+                // Prefetch user limit after token refresh
+                queryClient.prefetchQuery({
+                  queryKey: ['userLimit'],
+                  queryFn: () => detectUserLimit(newTokens.access_token)
+                })
               } catch (error) {
                 // If refresh fails, sign out
                 await signOut()
@@ -98,7 +111,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
     loadAuthState()
-  }, [signOut, refreshTokenMutation])
+  }, [signOut, refreshTokenMutation, queryClient])
 
   // Set up periodic token refresh
   useEffect(() => {

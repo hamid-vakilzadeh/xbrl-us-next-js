@@ -11,6 +11,7 @@ import { Icons } from '@/components/shared/Icons'
 import { useXBRLAuth } from '@/hooks/use-xbrl-auth'
 import { useAuth } from '@/components/auth/auth-provider'
 import { useQueryClient } from '@tanstack/react-query'
+import { detectUserLimit } from '@/api/facts'
 
 export function SignInForm() {
   const { signIn: signInXBRL, isLoading, error } = useXBRLAuth()
@@ -75,6 +76,14 @@ export function SignInForm() {
           return res.json()
         })
       })
+
+      // Prefetch user limit after successful authentication
+      if (authResult.access_token) {
+        queryClient.prefetchQuery({
+          queryKey: ['userLimit'],
+          queryFn: () => detectUserLimit(authResult.access_token)
+        });
+      }
       
       router.push('/dashboard')
     } catch (err: any) {
