@@ -1,84 +1,45 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/components/auth/auth-provider'
 import { 
-  fetchXBRLMeta, 
-  fetchAllEndpointsMeta, 
-  getStoredMeta, 
-  getStoredEndpointsMeta, 
+  useXBRLMeta as useXBRLMetaQuery,
+  useAllEndpointsMeta,
   type XBRLMeta, 
   type AllEndpointsMetadata 
 } from '@/api/meta'
 
-interface UseXBRLMetaResult {
-  meta: XBRLMeta | null
-  endpointsMeta: AllEndpointsMetadata | null
-  isLoading: boolean
-  error: Error | null
-  refetch: () => Promise<void>
-}
-
-export function useXBRLMeta(): UseXBRLMetaResult {
+export function useXBRLMeta() {
   const { user } = useAuth()
-  const [meta, setMeta] = useState<XBRLMeta | null>(null)
-  const [endpointsMeta, setEndpointsMeta] = useState<AllEndpointsMetadata | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-
-  const fetchAllMeta = useCallback(async () => {
-    if (!user?.accessToken) {
-      setError(new Error('No access token available'))
-      setIsLoading(false)
-      return
+  const accessToken = user?.accessToken || ''
+  
+  // Use the React Query hooks from our meta API
+  const { 
+    data: meta,
+    isLoading: isLoadingMeta,
+    error: metaError,
+    refetch: refetchMeta
+  } = useXBRLMetaQuery(accessToken)
+  
+  const {
+    data: endpointsMeta,
+    isLoading: isLoadingEndpoints,
+    error: endpointsError,
+    refetch: refetchEndpoints
+  } = useAllEndpointsMeta(accessToken, meta)
+  
+  // Combined refetch function
+  const refetch = async () => {
+    await refetchMeta()
+    if (meta) {
+      await refetchEndpoints()
     }
-
-    try {
-      setIsLoading(true)
-      setError(null)
-      
-      // First fetch main meta data
-      const mainMeta = await fetchXBRLMeta(user.accessToken)
-      setMeta(mainMeta)
-
-      // Then fetch metadata for all endpoints
-      const allEndpointsMeta = await fetchAllEndpointsMeta(user.accessToken, mainMeta)
-      setEndpointsMeta(allEndpointsMeta)
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch meta data'))
-      // Try to fall back to stored data
-      const storedMainData = getStoredMeta()
-      const storedEndpointsData = getStoredEndpointsMeta()
-      if (storedMainData) {
-        setMeta(storedMainData)
-      }
-      if (storedEndpointsData) {
-        setEndpointsMeta(storedEndpointsData)
-      }
-    } finally {
-      setIsLoading(false)
-    }
-  }, [user?.accessToken])
-
-  // Load meta data on mount or when auth changes
-  useEffect(() => {
-    const storedMainData = getStoredMeta()
-    const storedEndpointsData = getStoredEndpointsMeta()
-    
-    if (storedMainData && storedEndpointsData) {
-      setMeta(storedMainData)
-      setEndpointsMeta(storedEndpointsData)
-      setIsLoading(false)
-    } else {
-      fetchAllMeta()
-    }
-  }, [user?.accessToken, fetchAllMeta])
-
+  }
+  
   return {
-    meta,
-    endpointsMeta,
-    isLoading,
-    error,
-    refetch: fetchAllMeta
+    meta: meta || null,
+    endpointsMeta: endpointsMeta || null,
+    isLoading: isLoadingMeta || isLoadingEndpoints,
+    error: metaError || endpointsError,
+    refetch
   }
 }

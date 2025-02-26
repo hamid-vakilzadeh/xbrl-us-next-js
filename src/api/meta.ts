@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query'
+
 interface MetaEndpoint {
   object: string
   link: string
@@ -131,6 +133,50 @@ export async function fetchAllEndpointsMeta(accessToken: string, meta: XBRLMeta)
   }
 
   return allMetadata
+}
+
+// React Query hooks
+export function useXBRLMeta(accessToken: string) {
+  return useQuery({
+    queryKey: ['xbrl', 'meta'],
+    queryFn: () => fetchXBRLMeta(accessToken),
+    enabled: !!accessToken,
+    staleTime: 1000 * 60 * 60, // 1 hour
+    initialData: () => {
+      const storedData = localStorage.getItem(META_STORAGE_KEY)
+      if (!storedData) return undefined
+      return JSON.parse(storedData) as XBRLMeta
+    }
+  })
+}
+
+export function useEndpointMeta(accessToken: string, endpoint: keyof XBRLMeta, baseUrl: string | undefined) {
+  return useQuery({
+    queryKey: ['xbrl', 'meta', endpoint],
+    queryFn: () => {
+      if (!baseUrl) throw new Error('Base URL is required for endpoint metadata')
+      return fetchEndpointMeta(accessToken, endpoint, baseUrl)
+    },
+    enabled: !!accessToken && !!baseUrl,
+    staleTime: 1000 * 60 * 60, // 1 hour
+  })
+}
+
+export function useAllEndpointsMeta(accessToken: string, meta: XBRLMeta | undefined) {
+  return useQuery({
+    queryKey: ['xbrl', 'meta', 'all-endpoints'],
+    queryFn: () => {
+      if (!meta) throw new Error('Meta data is required for fetching all endpoints')
+      return fetchAllEndpointsMeta(accessToken, meta)
+    },
+    enabled: !!accessToken && !!meta,
+    staleTime: 1000 * 60 * 60, // 1 hour
+    initialData: () => {
+      const storedData = localStorage.getItem(ENDPOINTS_META_STORAGE_KEY)
+      if (!storedData) return undefined
+      return JSON.parse(storedData) as AllEndpointsMetadata
+    }
+  })
 }
 
 export function getStoredMeta(): XBRLMeta | null {

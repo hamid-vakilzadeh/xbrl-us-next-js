@@ -10,12 +10,13 @@ import { Alert, AlertDescription } from '@/components/ui/Alert'
 import { Icons } from '@/components/shared/Icons'
 import { useXBRLAuth } from '@/hooks/use-xbrl-auth'
 import { useAuth } from '@/components/auth/auth-provider'
-import { fetchXBRLMeta, fetchAllEndpointsMeta } from '@/api/meta'
+import { useQueryClient } from '@tanstack/react-query'
 
 export function SignInForm() {
   const { signIn: signInXBRL, isLoading, error } = useXBRLAuth()
   const { signIn: signInAuth } = useAuth()
   const router = useRouter()
+  const queryClient = useQueryClient()
   
   const [formData, setFormData] = useState({
     email: '',
@@ -23,9 +24,8 @@ export function SignInForm() {
     clientId: '',
     clientSecret: ''
   })
-
   const [errorMessage, setErrorMessage] = useState<string>('')
-
+  
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target
     setFormData(prev => ({
@@ -33,12 +33,19 @@ export function SignInForm() {
       [name]: value
     }))
   }
-
+  
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setErrorMessage('')
-
+    
+    // Validate form inputs before submission
+    if (!formData.email || !formData.password || !formData.clientId || !formData.clientSecret) {
+      setErrorMessage('All fields are required')
+      return
+    }
+    
     try {
+      // Pass individual parameters to maintain backward compatibility
       const authResult = await signInXBRL(
         formData.email,
         formData.password,
@@ -54,27 +61,34 @@ export function SignInForm() {
         formData.clientId,
         formData.clientSecret
       )
-
-      // Fetch and store meta data
-      try {
-        const mainMeta = await fetchXBRLMeta(authResult.access_token)
-        await fetchAllEndpointsMeta(authResult.access_token, mainMeta)
-      } catch (metaError) {
-        console.error('Failed to fetch meta data:', metaError)
-      }
+      
+      // Prefetch metadata - will be automatically cached by React Query
+      queryClient.prefetchQuery({
+        queryKey: ['xbrl', 'meta'],
+        queryFn: () => fetch('https://api.xbrl.us/api/v1/meta', {
+          headers: {
+            'Authorization': `Bearer ${authResult.access_token}`,
+            'Accept': 'application/json'
+          }
+        }).then(res => {
+          if (!res.ok) throw new Error('Failed to fetch XBRL meta data')
+          return res.json()
+        })
+      })
       
       router.push('/dashboard')
     } catch (err: any) {
       if (err.code === 'UNAUTHORIZED') {
         setErrorMessage('Invalid credentials. Please check your email and password.')
-      } else if (err.code === 'BAD_REQUEST') {
+      } else if (err.code === 'BAD_REQUEST' || err.code === 'MISSING_CREDENTIALS') {
         setErrorMessage('Please check all fields are filled correctly.')
       } else {
+        console.error('Authentication error:', err)
         setErrorMessage('An error occurred. Please try again.')
       }
     }
   }
-
+  
   return (
     <Card className="w-full max-w-lg">
       <CardHeader className="space-y-1">
@@ -117,7 +131,6 @@ export function SignInForm() {
               disabled={isLoading}
             />
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="clientId">Client ID</Label>
             <Input
@@ -131,7 +144,6 @@ export function SignInForm() {
               disabled={isLoading}
             />
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="clientSecret">Client Secret</Label>
             <Input

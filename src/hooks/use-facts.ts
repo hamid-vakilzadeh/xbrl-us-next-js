@@ -1,63 +1,62 @@
-import { useState, useCallback } from 'react'
+import { useCallback } from 'react'
 import { useAuth } from '@/components/auth/auth-provider'
-import { searchFacts, getFactById, type FactSearchParams, type FactResponse } from '@/api/facts'
+import { 
+  searchFacts, 
+  getFactById, 
+  useSearchFacts,
+  useFactById,
+  type FactSearchParams, 
+  type FactResponse 
+} from '@/api/facts'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-interface UseFactsResult {
-  isLoading: boolean
-  error: Error | null
-  data: FactResponse | null
-  search: (params: Omit<FactSearchParams, 'endpoint'> & { endpoint?: FactSearchParams['endpoint'] }) => Promise<void>
-  getById: (id: string | number) => Promise<any>
-}
-
-export function useFacts(): UseFactsResult {
+export function useFacts() {
   const { user } = useAuth()
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-  const [data, setData] = useState<FactResponse | null>(null)
+  const queryClient = useQueryClient()
 
-  const search = useCallback(async ({ endpoint = 'fact/search', ...params }: Omit<FactSearchParams, 'endpoint'> & { endpoint?: FactSearchParams['endpoint'] }) => {
-    if (!user?.accessToken) {
-      setError(new Error('No access token available'))
-      return
+  // Mutation for searching facts
+  const searchFactsMutation = useMutation({
+    mutationFn: async (params: Omit<FactSearchParams, 'endpoint'> & { endpoint?: FactSearchParams['endpoint'] }) => {
+      if (!user?.accessToken) {
+        throw new Error('No access token available')
+      }
+      const endpoint = params.endpoint || 'fact/search'
+      return searchFacts(user.accessToken, { endpoint, ...params })
+    },
+    // Optionally invalidate relevant queries after mutation
+    onSuccess: () => {
+      // You can invalidate specific queries if needed
+      // queryClient.invalidateQueries({ queryKey: ['facts'] })
     }
+  })
 
-    setIsLoading(true)
-    setError(null)
-    try {
-      const result = await searchFacts(user.accessToken, { endpoint, ...params })
-      setData(result)
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to search facts'))
-      setData(null)
-    } finally {
-      setIsLoading(false)
+  // Mutation for getting fact by ID
+  const getFactByIdMutation = useMutation({
+    mutationFn: async (id: string | number) => {
+      if (!user?.accessToken) {
+        throw new Error('No access token available')
+      }
+      return getFactById(user.accessToken, id)
     }
-  }, [user?.accessToken])
-
+  })
+  
+  // Helper function that maintains the same API as before
+  const search = useCallback(async (params: Omit<FactSearchParams, 'endpoint'> & { endpoint?: FactSearchParams['endpoint'] }) => {
+    return searchFactsMutation.mutateAsync(params)
+  }, [searchFactsMutation])
+  
   const getById = useCallback(async (id: string | number) => {
-    if (!user?.accessToken) {
-      throw new Error('No access token available')
-    }
-
-    setIsLoading(true)
-    setError(null)
-    try {
-      const result = await getFactById(user.accessToken, id)
-      return result
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error(`Failed to get fact ${id}`))
-      throw err
-    } finally {
-      setIsLoading(false)
-    }
-  }, [user?.accessToken])
+    return getFactByIdMutation.mutateAsync(id)
+  }, [getFactByIdMutation])
 
   return {
-    isLoading,
-    error,
-    data,
+    isLoading: searchFactsMutation.isPending || getFactByIdMutation.isPending,
+    error: searchFactsMutation.error || getFactByIdMutation.error,
+    data: searchFactsMutation.data,
     search,
-    getById
+    getById,
+    // Also expose the React Query hooks directly for more complex use cases
+    useSearchFacts: (params: FactSearchParams) => useSearchFacts(user?.accessToken || '', params),
+    useFactById: (id: string | number) => useFactById(user?.accessToken || '', id)
   }
 }
