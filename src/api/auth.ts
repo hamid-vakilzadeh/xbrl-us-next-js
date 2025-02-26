@@ -82,7 +82,7 @@ export async function refreshXBRLToken(
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: new URLSearchParams({
-      grant_type: 'refresh_token',
+      grant_type: 'password',
       client_id: clientId,
       client_secret: clientSecret,
       refresh_token: refreshToken,
