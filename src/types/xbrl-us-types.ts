@@ -27,7 +27,8 @@ type ConceptDatatype =
   | 'positiveIntegerItemType' | 'fundingImprovementAndRehabilitationPlanItemType'
   | 'surchargeItemType' | 'internationalNameItemType' | 'statesOfUnitedStatesItemType'
   | 'nonemptySequenceNumberItemType' | 'enumerationSetItemType' | 'sicNumberItemType'
-  | 'fileItemType' | 'ShareholdersReportSubmittedItemType';
+  | 'fileItemType' | 'ShareholdersReportSubmittedItemType'
+  | (string & {}); 
 
 // Dimension Fields
 type DimensionPair = string | null;
@@ -52,7 +53,8 @@ type EntityScheme =
   | 'http://www.sec.gov/CIK' 
   | 'http://xbrl.org/entity/identification/scheme'
   | 'http://standards.iso.org/iso/17442'
-  | 'http://www.ferc.gov/CID';
+  | 'http://www.ferc.gov/CID'
+  | (string & {}); 
 
 // Fact Fields
 type FactAccuracyIndex = number;
