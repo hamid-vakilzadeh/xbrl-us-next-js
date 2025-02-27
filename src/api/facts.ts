@@ -1,6 +1,6 @@
 import { XBRLMeta } from './meta'
 import { useQuery } from '@tanstack/react-query'
-
+import { FactDimension, FactData} from '@/types/xbrl-us-types'
 interface FactSearchParams {
   endpoint: 'fact/search' | 'fact/oim/search'
   fields?: string[]
@@ -10,114 +10,6 @@ interface FactSearchParams {
   wait?: number
 }
 
-// Matching the actual API response format
-interface FactDimension {
-  dimension_namespace: string;
-  dimension_local_name: string;
-  member_namespace: string;
-  member_local_name: string;
-}
-
-interface FactData {
-  // Concept fields
-  'concept.balance-type'?: string;
-  'concept.datatype'?: string;
-  'concept.id'?: number;
-  'concept.is-base'?: boolean;
-  'concept.is-monetary'?: boolean;
-  'concept.local-name'?: string;
-  'concept.namespace'?: string;
-  'concept.period-type'?: string;
-  
-  // Dimension fields
-  'dimension-pair'?: string | null;
-  'dimension.is-base'?: boolean | null;
-  'dimension.local-name'?: string;
-  'dimension.namespace'?: string;
-  'dimensions'?: FactDimension[] | string;
-  'dimensions.count'?: number;
-  'dimensions.id'?: string | null;
-  
-  // DTS fields
-  'dts.entry-point'?: string;
-  'dts.id'?: number;
-  'dts.target-namespace'?: string;
-  
-  // Entity fields
-  'entity.cik'?: string;
-  'entity.code'?: string;
-  'entity.id'?: number;
-  'entity.name'?: string;
-  'entity.scheme'?: string;
-  
-  // Fact fields
-  'fact.accuracy-index'?: number;
-  'fact.decimals'?: number | string;
-  'fact.has-dimensions'?: boolean;
-  'fact.hash'?: string;
-  'fact.id'?: number;
-  'fact.inline-display-value'?: string;
-  'fact.inline-is-hidden'?: boolean | null;
-  'fact.inline-negated'?: boolean | null;
-  'fact.inline-scale'?: number;
-  'fact.is-extended'?: boolean;
-  'fact.numerical-value'?: number;
-  'fact.ultimus'?: boolean;
-  'fact.ultimus-index'?: number;
-  'fact.value'?: string | number;
-  'fact.value-link'?: string;
-  'fact.xml-id'?: string;
-  
-  // Member fields
-  'member.is-base'?: boolean | null;
-  'member.local-name'?: string;
-  'member.member-value'?: string;
-  'member.namespace'?: string;
-  'member.typed-value'?: string;
-  
-  // Period fields
-  'period.calendar-period'?: string;
-  'period.end'?: string | null;
-  'period.fiscal-id'?: string;
-  'period.fiscal-period'?: string;
-  'period.fiscal-year'?: number;
-  'period.id'?: string;
-  'period.instant'?: string;
-  'period.start'?: string | null;
-  'period.year'?: number;
-  
-  // Report fields
-  'report.accession'?: string;
-  'report.creation-software'?: string;
-  'report.document-index'?: number;
-  'report.document-type'?: string;
-  'report.documentset-num'?: number;
-  'report.entry-url'?: string;
-  'report.event-items'?: string;
-  'report.filing-date'?: string;
-  'report.form-type'?: string;
-  'report.hash'?: string;
-  'report.html-url'?: string;
-  'report.id'?: number;
-  'report.is-most-current'?: boolean;
-  'report.period-end'?: string;
-  'report.period-focus'?: string;
-  'report.restated'?: boolean;
-  'report.restated-index'?: number | string;
-  'report.sec-url'?: string;
-  'report.sic-code'?: number;
-  'report.source-id'?: number;
-  'report.source-name'?: string;
-  'report.submission-type'?: string;
-  'report.type'?: string;
-  'report.year-focus'?: string;
-  
-  // Unit fields
-  'unit'?: string;
-  'unit.denominator'?: string;
-  'unit.numerator'?: string;
-  'unit.qname'?: string;
-}
 
 interface FactResponse {
   data: FactData[]
